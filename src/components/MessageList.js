@@ -19,9 +19,12 @@ class MessageList extends React.Component {
   render(){
     return(
       <div className="message-list">
-        {testData.map((message, index) => {
+        {testData.map((message) => {
           return(
-            <div key={index}>{message.text}</div>
+            <div key={message.senderId}>
+            <div>{message.senderId}</div>
+            <div>{message.text}</div>
+            </div>
           )
         })}
       </div>

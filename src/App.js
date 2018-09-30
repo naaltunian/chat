@@ -5,7 +5,33 @@ import RoomList from './components/RoomList';
 import NewRoomForm from './components/NewRoomForm';
 import './App.css';
 
+import Chatkit from '@pusher/chatkit'
+
+import {url, instanceLocator} from './config.js';
+
 class App extends Component {
+
+  componentDidMount() {
+    const chatManager = new Chatkit.ChatManager({
+      instanceLocator: instanceLocator,
+      userId: 'Nick',
+      tokenProvider: new Chatkit.TokenProvider({
+        url: url
+      })
+    })
+    chatManager.connect()
+    .then(currentUser => {
+      currentUser.subscribeToRoom({
+        roomId: 17500194,
+        hooks: {
+          onNewMessage: message => {
+            console.log('message.text: ', message.text);
+          }
+        }
+      })
+    })
+  }
+
   render() {
     return (
       <div>
