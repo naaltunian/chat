@@ -12,7 +12,9 @@ import {url, instanceLocator} from './config.js';
 class App extends Component {
 
   state = {
-    messages: []
+    messages: [],
+    joinableRooms: [],
+    joinedRooms: []
   }
 
   componentDidMount() {
@@ -25,23 +27,45 @@ class App extends Component {
     })
     chatManager.connect()
     .then(currentUser => {
-      currentUser.subscribeToRoom({
-        roomId: 17500194,
-        hooks: {
-          onNewMessage: message => {
-            this.setState({ messages: [...this.state.messages, message]})
-          }
+      this.currentUser = currentUser;
+      this.getRoom();
+      this.subscribeToRoom();
+    })
+    .catch(error => console.log('error on connecting: ', error))
+  }
+
+  subscribeToRoom = () => {
+    this.currentUser.subscribeToRoom({
+      roomId: 17500194,
+      hooks: {
+        onNewMessage: message => {
+          this.setState({ messages: [...this.state.messages, message]})
         }
-      })
+      }
+    })
+  }
+
+  getRoom = () => {
+    this.currentUser.getJoinableRooms()
+    .then(joinableRooms => {
+      this.setState({ joinableRooms, joinedRooms: this.currentUser.rooms})
+    })
+    .catch(error => {console.log('error on joinable rooms: ', error)})
+  }
+
+  sendMessage = (text) => {
+    this.currentUser.sendMessage({
+      text: text,
+      roomId: 17500194
     })
   }
 
   render() {
     return (
       <div>
-        <RoomList />
+        <RoomList subscribeToRoom={this.subscribeToRoom} rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]} />
         <MessageList messages={this.state.messages} />
-        <SendMessageForm />
+        <SendMessageForm sendMessage={this.sendMessage} />
         <NewRoomForm />
       </div>
     );
