@@ -28,21 +28,29 @@ class App extends Component {
     chatManager.connect()
     .then(currentUser => {
       this.currentUser = currentUser;
-      this.currentUser.getJoinableRooms()
-      .then(joinableRooms => {
-        this.setState({ joinableRooms, joinedRooms: this.currentUser.rooms})
-      })
-      .catch(error => {console.log('error on joinable rooms: ', error)})
-      this.currentUser.subscribeToRoom({
-        roomId: 17500194,
-        hooks: {
-          onNewMessage: message => {
-            this.setState({ messages: [...this.state.messages, message]})
-          }
-        }
-      })
+      this.getRoom();
+      this.subscribeToRoom();
     })
     .catch(error => console.log('error on connecting: ', error))
+  }
+
+  subscribeToRoom = () => {
+    this.currentUser.subscribeToRoom({
+      roomId: 17500194,
+      hooks: {
+        onNewMessage: message => {
+          this.setState({ messages: [...this.state.messages, message]})
+        }
+      }
+    })
+  }
+
+  getRoom = () => {
+    this.currentUser.getJoinableRooms()
+    .then(joinableRooms => {
+      this.setState({ joinableRooms, joinedRooms: this.currentUser.rooms})
+    })
+    .catch(error => {console.log('error on joinable rooms: ', error)})
   }
 
   sendMessage = (text) => {

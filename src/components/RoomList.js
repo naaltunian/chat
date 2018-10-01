@@ -8,7 +8,7 @@ const RoomList = (props) => {
         {props.rooms.map(room => {
           return(
             <li key={room.id} className="room">
-              <a href='#'>{room.name}</a>
+              <a href=''>{room.name}</a>
             </li>
           )
         })}
